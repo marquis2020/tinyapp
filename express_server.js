@@ -6,6 +6,11 @@ app.set("view engine", "ejs");
 function generateRandomString() {
 return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5)
 }
+app.post("/urls/:shortURL/delete", (req, res) => {
+  let { shortURL } = req.params;
+  delete urlDatabase[shortURL];
+  res.redirect('/urls')
+})
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
