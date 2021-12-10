@@ -20,6 +20,9 @@ const urlDatabase = {
 //////Update: Update a record's value //////
 
 //////Delete: Delete a record //////
+
+app.use(cookieParser());
+
 // generate random string
 function generateRandomString() {
 return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5)
@@ -27,7 +30,8 @@ return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).s
 //ROUTES
 //route to render the urls_new.ejs template btn code in header.ejs
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
 
 //creates new random string and assings it
@@ -47,7 +51,10 @@ app.get("/u/:shortURL", (req, res) => {
 
 // passes in our urlDatabase as a second param 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+
   res.render("urls_index", templateVars);
 });
 
@@ -66,9 +73,14 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = {
+   username:req.cookies["username"],
+   shortURL: req.params.shortURL, 
+   longURL: urlDatabase[req.params.shortURL] 
+  };
   res.render("urls_show", templateVars);
 });
+
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   urlDatabase[req.params.id] = req.body.longURL;
@@ -97,6 +109,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect("/urls");
+});
 
 //takes the port and a callback
 app.listen(PORT, () => {
