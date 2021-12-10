@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 //configure ejs templats///////
@@ -90,6 +91,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.redirect(`/urls/${req.params.shortURL}`);
 
  })
+ //post requst to habdle log in and set cookie!
+ app.post("/login", (req,res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+});
+
 
 //takes the port and a callback
 app.listen(PORT, () => {
