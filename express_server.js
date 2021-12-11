@@ -1,4 +1,5 @@
 const express = require("express");
+const { urlDatabase, newUser, checkRegistration, checkEmail, generateRandomString }= require('./helper');
 const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
@@ -9,38 +10,6 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 //////////////////////////////
 
-
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-
-const users = { 
-  "userRandomID": {
-    id: "jackT", 
-    email: "user@ex.com", 
-    password: "123"
-  },
- "user2RandomID": {
-    id: "JillV", 
-    email: "user2@ex.com", 
-    password: "456"
-  }
-};
-//////Create: Add a new record //////
-
-//////Read: Retrieve the value of a record /////
-
-//////Update: Update a record's value //////
-
-//////Delete: Delete a record //////
-
-
-
-// generate random string
-function generateRandomString() {
-return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5)
-}
 //ROUTES
 //route to render the urls_new.ejs template btn code in header.ejs
 app.get("/urls/new", (req, res) => {
@@ -126,14 +95,20 @@ app.get("/register", (req,res) => {
 });
 //register new user and add them to the user object
 app.post("/register", (req,res) => {
-  const userId = generateRandomString();
-  users[userId] = {
-    id: userId,
-    email: req.body.email,
-    password: req.body.password
-  };
+  const { email, password } = req.body;
+  if (!checkRegistration(email, password)) {
+    res.status(400).send('Email and/or password is missing');
+    // setTimeout(() => {
+    //   res.render("urls_register", templateVars);
+    // }, 3000);
+  } else if (checkEmail(email)) {
+    res.status(400).send('This email is already in use')
+  } else {
+    const userId = newUser(email, password);
+    
   res.cookie('userId', userId);
   res.redirect('/urls');
+  }
 })
 
 //takes the port and a callback
