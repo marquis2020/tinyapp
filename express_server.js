@@ -1,5 +1,5 @@
 const express = require("express");
-const { urlDatabase, newUser, checkRegistration, checkEmail, generateRandomString }= require('./helper');
+const { urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString, findUserByEmail }= require('./helper');
 const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
@@ -78,15 +78,30 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.redirect(`/urls/${req.params.shortURL}`);
 
  })
+ 
  //post requst to habdle log in and set cookie and log in!
  app.post("/login", (req,res) => {
-  res.cookie('userId', req.body.username);
+  const email = req.body.email; 
+  const password = req.body.password;
+
+  const user = findUserByEmail(email);
+
+  if (!user || user.password != password) {
+    return res.status(403).send("a user with that email doesn't exist")
+  }
+
+
+  res.cookie('userId', user.id);
   res.redirect("/urls");
+});
+app.get("/login", (req, res) => {
+  let templateVars = { userId: req.cookies["userId"] };
+  res.render("urls_login", templateVars);
 });
 //log out by clearing the cookie we had set
 app.post("/logout", (req, res) => {
   res.clearCookie('userId');
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 //endpoint, which returns the template you just created
 app.get("/register", (req,res) => {
@@ -95,20 +110,20 @@ app.get("/register", (req,res) => {
 });
 //register new user and add them to the user object
 app.post("/register", (req,res) => {
-  const { email, password } = req.body;
+  const email = req.body.email;
+  const password = req.body.email;
   if (!checkRegistration(email, password)) {
-    res.status(400).send('Email and/or password is missing');
-    // setTimeout(() => {
-    //   res.render("urls_register", templateVars);
-    // }, 3000);
-  } else if (checkEmail(email)) {
-    res.status(400).send('This email is already in use')
-  } else {
-    const userId = newUser(email, password);
+   return res.status(400).send('Email and/or password is missing');
+  } 
+  
+  if (checkEmail(email)) {
+    return res.status(400).send('This email is already in use')
+  } 
+  const userId = newUser(email, password);
     
   res.cookie('userId', userId);
   res.redirect('/urls');
-  }
+  
 })
 
 //takes the port and a callback

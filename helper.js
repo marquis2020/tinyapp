@@ -35,6 +35,16 @@ const newUser = (email, password) => {
   return id;
 };
 
+const findUserByEmail = (email) => {
+  for(const id in users) {
+    const user = users[id];
+    if(user.email === email) {
+      return user;
+    }
+  }
+  return null;
+}
+
 const checkRegistration = (email, password) => {
   if (email && password) {
     return true;
@@ -52,4 +62,4 @@ function generateRandomString() {
 return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5)
 }
 
-module.exports = {urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString}
+module.exports = {urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString, findUserByEmail}
