@@ -1,20 +1,14 @@
-//////Create: Add a new record //////
-
-//////Read: Retrieve the value of a record /////
-
-//////Update: Update a record's value //////
-
-//////Delete: Delete a record //////
+//helper function file
 cookieSession = require('cookie-session')
 const express = require("express");
 const { findUserByEmail } = require('./helpers')
-const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 
 const bcrypt = require('bcryptjs');
-
+//base database for sites 
+//these sites are for testing
 const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
@@ -25,7 +19,8 @@ const urlDatabase = {
     usersId: "JillV"
   }
 };
-
+//base data base for users
+// these users are for testing
 const users = {
   "jackT": {
     id: "jackT",
@@ -38,6 +33,7 @@ const users = {
     password: bcrypt.hashSync("456", 10)
   }
 };
+//creates a new user and adds it to the user
 const newUser = (userId, email, password) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   users[userId] = {
@@ -47,28 +43,18 @@ const newUser = (userId, email, password) => {
   };
   return userId;
 };
-
-// const findUserByEmail = (users,email) => {
-//   for(const id in users) {
-//     const user = users[id];
-//     if(user.email === email) {
-//       return user;
-//     }
-//   }
-//   return null;
-// }
-
+//checks if a user is already registered
 const checkRegistration = (email, password) => {
   if (email && password) {
     return true;
   }
   return false
 };
-
+//checks if a email its already assosiated to a users account at registration 
 const checkEmail = email => {
   return Object.values(users).find(user => user.email === email);
 }
-
+// gets the specific urls for specific users
 const getUsersUrls = function (id) {
   let yourUrls = {};
   for (const shortURL of Object.keys(urlDatabase)) {
@@ -89,7 +75,6 @@ function generateRandomString() {
 module.exports = {
   cookieSession,
   express,
-  app,
   PORT,
   cookieParser,
   bodyParser,

@@ -1,6 +1,5 @@
 const { cookieSession,
   express,
-  app,
   PORT,
   cookieParser,
   bodyParser,
@@ -17,7 +16,7 @@ const { cookieSession,
 
 
 
-
+const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cookieSession({
@@ -93,7 +92,7 @@ app.get("/urls2.json", (req, res) => {
 });
 
 
-
+//shows the urls on the edit page
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session.userId;
   const shortURL = req.params.shortURL;
@@ -138,8 +137,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
 // updates saved urls
 app.post("/urls/:shortURL/update", (req, res) => {
-
-
   const userId = req.session.userId;
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;

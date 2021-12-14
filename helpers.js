@@ -1,4 +1,5 @@
-
+//finds user object by email. 
+// in this file to seperate from the other helper functions for testing
 
 const findUserByEmail = (users, email) => {
   for (const id in users) {
