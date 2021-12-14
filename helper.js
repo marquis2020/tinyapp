@@ -5,8 +5,13 @@
 //////Update: Update a record's value //////
 
 //////Delete: Delete a record //////
+const express = require("express");
+const app = express();
+const PORT = 8080; // default port 8080
+const cookieParser = require('cookie-parser');
+const bodyParser = require("body-parser");
 
-
+const bcrypt = require('bcryptjs');
 
 const urlDatabase = {
   b2xVn2: { 
@@ -23,24 +28,25 @@ const users = {
   "jackT": {
     id: "jackT", 
     email: "user@ex.com", 
-    password: "123"
+    password:  bcrypt.hashSync("123", 10)
   },
   "JillV": {
     id: "JillV", 
     email: "user2@ex.com", 
-    password: "456"
+    password: bcrypt.hashSync("456", 10)
   }
 };
 const newUser = (userId, email, password) => {
+  const hashedPassword = bcrypt.hashSync(password, 10);
   users[userId] = {
     id: userId,
     email: email,
-    password: password
+    password: hashedPassword,
   };
   return userId;
 };
 
-const findUserByEmail = (email) => {
+const findUserByEmail = (users,email) => {
   for(const id in users) {
     const user = users[id];
     if(user.email === email) {
@@ -79,12 +85,18 @@ return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).s
 }
 
 module.exports = {
-  urlDatabase, 
-  users, 
-  newUser, 
-  checkRegistration, 
-  checkEmail, 
-  generateRandomString, 
-  findUserByEmail, 
-  getUsersUrls
+  express,
+   app,
+    PORT,
+    cookieParser,
+     bodyParser,
+      urlDatabase,
+       users,
+        newUser,
+         checkRegistration,
+          checkEmail,
+           generateRandomString,
+            findUserByEmail,
+             getUsersUrls,
+              bcrypt
 }

@@ -1,11 +1,11 @@
-const express = require("express");
-const { urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString, findUserByEmail, getUsersUrls }= require('./helper');
-const app = express();
-const PORT = 8080; // default port 8080
-const cookieParser = require('cookie-parser');
-const bodyParser = require("body-parser");
+const { express, app, PORT,cookieParser, bodyParser, urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString, findUserByEmail, getUsersUrls, bcrypt }= require('./helper');
+
+
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+
+
 //configure ejs templats///////
 app.set("view engine", "ejs");
 //////////////////////////////
@@ -79,7 +79,7 @@ app.get("/urls/:shortURL", (req, res) => {
   //const longURL = req.body.longURL;
   const templateVars = {
     userId: req.cookies["userId"],
-   shortURL: req.params.shortURL, 
+   shortURL: shortURL, 
    longURL: urlDatabase[shortURL]['longURL'], 
    user: users[userId]
   };
@@ -88,11 +88,11 @@ app.get("/urls/:shortURL", (req, res) => {
   //   res.redirect("/login");
   // }
 
-  if (userId === urlDatabase[templateVars.shortURL].usersId) {
-    res.render("urls_show", templateVars);
-  } else {
-    res.render("urls_show", templateVars);
-  }
+  // if (userId === urlDatabase[templateVars.shortURL].usersId) {
+  //   res.render("urls_show", templateVars);
+  // } else {
+    res.render("urls_show", (templateVars));
+  //}
   
 });
 
@@ -119,11 +119,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
   // updates saved urls
   app.post("/urls/:shortURL/update", (req, res) => {
+    
+
     const userId = req.cookies['userId'];
     const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] ={ longURL: req.body.longURL, usersId: userId};
-    res.redirect(`/urls/${req.params.shortURL, longURL}`);
+  urlDatabase[shortURL] = { longURL: req.body.longURL, usersId: userId};
+    res.redirect(`/urls/${req.params.shortURL}`);
 
  })
  
@@ -132,12 +134,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const email = req.body.email; 
   const password = req.body.password;
 
-  const user = findUserByEmail(email);
+  const user = findUserByEmail(users, email);
 
-  if (!user || user.password != password) {
+  if (!user || !password) {
     return res.status(403).send(" user doesn't exist")
   }
-  
+  if (Object.keys(user).length > 0 && bcrypt.compareSync(password, user.password)) {
+    
+  }
 
   res.cookie('userId', user.id);
   res.redirect("/urls");
