@@ -1,9 +1,13 @@
-const { express, app, PORT,cookieParser, bodyParser, urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString, findUserByEmail, getUsersUrls, bcrypt }= require('./helper');
+const { cookieSession, express, app, PORT,cookieParser, bodyParser, urlDatabase, users, newUser, checkRegistration, checkEmail, generateRandomString, findUserByEmail, getUsersUrls, bcrypt }= require('./helper');
 
 
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['onekey']
+}))
 
 
 //configure ejs templats///////
@@ -13,20 +17,20 @@ app.set("view engine", "ejs");
 //ROUTES
 //route to render the urls_new.ejs template btn code in header.ejs
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies["userId"];
+  const userId = req.session.userId;
 
   if (!userId) {
     res.redirect("/login");
   }
   let templateVars = { 
-    userId: req.cookies["userId"] 
+    userId: userId
   };
   res.render("urls_new", templateVars);
 });
 
 //creates new random string and assings it
 app.post("/urls", (req, res) => {
-  const userId = req.cookies["userId"];
+  const userId = req.session.userId;
   const longURL = req.body.longURL;
   let ID = generateRandomString();
   urlDatabase[ID] = {
@@ -47,7 +51,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 // passes in our urlDatabase as a second param 
 app.get("/urls", (req, res) => {
-  const userId = req.cookies["userId"];
+  const userId = req.session.userId;;
   const user = users[userId];
 
   if (!user) {
@@ -74,25 +78,23 @@ app.get("/urls2.json", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  const userId = req.cookies["userId"];
+  const userId = req.session.userId;
   const shortURL = req.params.shortURL;
-  //const longURL = req.body.longURL;
+  
   const templateVars = {
-    userId: req.cookies["userId"],
+    userId: userId ,
    shortURL: shortURL, 
    longURL: urlDatabase[shortURL]['longURL'], 
    user: users[userId]
   };
   
-  // if (!userId) {
-  //   res.redirect("/login");
-  // }
+  if (!userId) {
+    res.redirect("/login");
+  }
 
-  // if (userId === urlDatabase[templateVars.shortURL].usersId) {
-  //   res.render("urls_show", templateVars);
-  // } else {
+  
     res.render("urls_show", (templateVars));
-  //}
+  
   
 });
 
@@ -108,7 +110,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   //let { shortURL } = req.params;
   const shortURL = req.params.shortURL;
-  const userId = req.cookies['userId'];
+  const userId = req.session.userId;
   const urlUserId = urlDatabase[shortURL]['usersId'];
 
   if (urlUserId === userId) {
@@ -121,7 +123,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   app.post("/urls/:shortURL/update", (req, res) => {
     
 
-    const userId = req.cookies['userId'];
+    const userId = req.session.userId;
     const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = { longURL: req.body.longURL, usersId: userId};
@@ -143,23 +145,25 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     
   }
 
-  res.cookie('userId', user.id);
+  req.session.userId = user['id'];
   res.redirect("/urls");
 });
 
 
 app.get("/login", (req, res) => {
-  let templateVars = { userId: req.cookies["userId"] };
+   let userId = req.session.userId;
+  let templateVars = { userId };
   res.render("urls_login", templateVars);
 });
 //log out by clearing the cookie we had set
 app.post("/logout", (req, res) => {
-  res.clearCookie('userId');
+  req.session = null;
   res.redirect("/login");
 });
 //endpoint, which returns the template you just created
 app.get("/register", (req,res) => {
-  let templateVars = { userId: req.cookies["userId"] };
+  let userId = req.session.userId;
+  let templateVars = { userId };
   res.render("urls_register", templateVars);
 });
 //register new user and add them to the user object
@@ -177,7 +181,7 @@ app.post("/register", (req,res) => {
   const userId = generateRandomString();
   const newUserProfile = newUser(userId, email, password);
     
-  res.cookie('userId', userId);
+  req.session.userId = userId;
   res.redirect('/urls');
   
 })

@@ -5,6 +5,7 @@
 //////Update: Update a record's value //////
 
 //////Delete: Delete a record //////
+cookieSession = require('cookie-session')
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -85,18 +86,19 @@ return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).s
 }
 
 module.exports = {
+  cookieSession,
   express,
-   app,
-    PORT,
-    cookieParser,
-     bodyParser,
-      urlDatabase,
-       users,
-        newUser,
-         checkRegistration,
-          checkEmail,
-           generateRandomString,
-            findUserByEmail,
-             getUsersUrls,
-              bcrypt
+  app,
+  PORT,
+  cookieParser,
+  bodyParser,
+  urlDatabase,
+  users,
+  newUser,
+  checkRegistration,
+  checkEmail,
+  generateRandomString,
+  findUserByEmail,
+  getUsersUrls,
+  bcrypt
 }
