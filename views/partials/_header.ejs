@@ -12,7 +12,7 @@
     <% if (userId) { %>
       <!--logout-->
       <form class="form-inline" action="/logout" method="POST">
-        <p>Logged in as <%= userId %></p>
+        <p>Logged in as <%= userId           %></p>
         <button type="submit" class="btn btn-primary">Logout</button>
       </form>
       <% } else { %>
@@ -24,7 +24,7 @@
       <button type="submit" class="btn btn-outline-light">Login</button>
     </form> -->
     
-    <a class="nav-item nav-link" href="/login">Login</a>
+    <a class="nav-item nav-link" href="/login" >Login</a>
         <a class="nav-item nav-link" href="/register">Register</a>
     <% } %>
     

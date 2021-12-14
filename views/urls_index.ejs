@@ -29,11 +29,11 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url].longURL  %></td>
             <!-- creating submit type btn to use as an edit btn -->
-            <td><form method="post" action="/urls/<%= url %>/update"><button type="submit" class="btn btn-primary">Edit</button></form></td>
+            <td><form method="post" action="/urls/<%= url %>/update"><button type="submit" class="btn btn-outline-primary">Edit</button></form></td>
             <!-- creating submit type btn to use as an delete btn -->
-            <td><form method="POST" action="/urls/<%= url %>/delete"><button type="delete" class="btn btn-danger">Delete</button></form></td>
+            <td><form method="POST" action="/urls/<%= url %>/delete"><button type="delete" class="btn btn-outline-danger">Delete</button></form></td>
 
           </tr>
         <% } %>
