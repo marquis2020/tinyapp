@@ -31,14 +31,13 @@ const users = {
     password: "456"
   }
 };
-const newUser = (email, password) => {
-  const id = generateRandomString();
-  users[id] = {
-    id,
-    email,
-    password
+const newUser = (userId, email, password) => {
+  users[userId] = {
+    id: userId,
+    email: email,
+    password: password
   };
-  return id;
+  return userId;
 };
 
 const findUserByEmail = (email) => {
